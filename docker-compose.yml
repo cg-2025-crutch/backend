@@ -1,35 +1,56 @@
 services:
+  us-db:
+    image: postgres:12
+    container_name: us-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: dbusers
+    ports:
+      - "5432:5432"
+    volumes:
+      - us-db_data:/var/lib/postgresql/data
+    networks:
+      us:
+
+  us-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: us-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      - us-db
+    networks:
+      us:
+
+
   ns-redis:
     container_name: ns-redis
     image: redis:8.2.1-alpine
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${CACHE_PASSWORD}"]
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "1234"]
     volumes:
       - redis_data:/data
     ports:
       - "6379:6379"
-    env_file:
-      - .env
     environment:
-      - CACHE_PASSWORD=${CACHE_PASSWORD}
+      CACHE_PASSWORD: 1234
     networks:
-      - skynet
+      ns:
 
   ns-service:
     build:
-      context: .
+      context: ./notification-service
       dockerfile: Dockerfile
-    container_name: rec-service
+    container_name: ns-service
     ports:
-      - "${GRPC_PORT}:${GRPC_PORT}"
-      - "${HTTP_PORT}:${HTTP_PORT}"
-    env_file:
-      - .env
+      - "50051:50051"
+      - "8080:8080"
     depends_on:
       - ns-kafka
     networks:
-      - skynet
-
-
+      ns:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -40,7 +61,7 @@ services:
     ports:
       - "2181:2181"
     networks:
-      - skynet
+      ns:
 
   ns-kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -57,7 +78,7 @@ services:
     ports:
       - "9092:9092"
     networks:
-      skynet:
+      ns:
 
   akhq:
     image: tchiotludo/akhq
@@ -68,7 +89,7 @@ services:
     depends_on:
       - ns-kafka
     networks:
-      - skynet
+      ns:
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -80,7 +101,9 @@ services:
                 bootstrap.servers: "ns-kafka:29092"
 
 volumes:
+  us-db_data:
   redis_data:
 
 networks:
-  skynet:
+  ns:
+  us:
