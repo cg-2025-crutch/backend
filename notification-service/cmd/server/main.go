@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/SherClockHolmes/webpush-go"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/adapters/consumer"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/config"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/infrastructure/kafka"
@@ -75,6 +76,11 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
+
+	privateKey, publicKey, err := webpush.GenerateVAPIDKeys()
+
+	fmt.Println("VAPID_PRIVATE_KEY =", privateKey)
+	fmt.Println("VAPID_PUBLIC_KEY  =", publicKey)
 
 	// Start HTTP server in a goroutine
 	go func() {
