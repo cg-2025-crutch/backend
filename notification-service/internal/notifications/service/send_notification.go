@@ -13,6 +13,9 @@ import (
 func (s *NotificationService) SendNotification(ctx context.Context, userUID string, not models.Notification) error {
 	l := log.FromContext(ctx)
 
+	l.Infof("Sending notification to user %s", userUID)
+	l.Infof("Notification model: %s", not)
+
 	payload, err := easyjson.Marshal(not)
 	if err != nil {
 		l.Error("failed to marshal notification", err)
@@ -36,6 +39,10 @@ func (s *NotificationService) SendNotification(ctx context.Context, userUID stri
 }
 
 func (s *NotificationService) sendToSubscriber(ctx context.Context, sb models.StoredSubscription, payload []byte) error {
+	l := log.FromContext(ctx)
+
+	l.Infof("stored subscriber: %s", sb)
+
 	sub := &webpush.Subscription{
 		Endpoint: sb.Endpoint,
 		Keys: webpush.Keys{
