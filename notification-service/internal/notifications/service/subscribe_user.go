@@ -11,7 +11,10 @@ import (
 
 func (s *NotificationService) SubscribeUser(ctx context.Context, userId, endpoint, p256dh, auth string) error {
 	l := log.FromContext(ctx)
-	l.Info(userId, endpoint, p256dh, auth)
+	l.Infof("new subscriber userid: %s", userId)
+	l.Infof("new subscriber endpoint: %s", endpoint)
+	l.Infof("new subscriber p256: %s", p256dh)
+	l.Infof("new subscriber auth: %s", auth)
 
 	sub := models.StoredSubscription{
 		Endpoint:  endpoint,
