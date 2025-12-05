@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/SherClockHolmes/webpush-go"
@@ -39,8 +40,19 @@ func (s *NotificationService) sendToSubscriber(ctx context.Context, sb models.St
 	l := log.FromContext(ctx)
 
 	l.Infof("stored subscriber endpoint: %s", sb.Endpoint)
-	l.Infof("stored subscriber p256: %s", sb.P256dh)
-	l.Infof("stored subscriber auth: %s", sb.Auth)
+	l.Infof("stored subscriber p256 length: %d, value: %s", len(sb.P256dh), sb.P256dh)
+	l.Infof("stored subscriber auth length: %d, value: %s", len(sb.Auth), sb.Auth)
+
+	// Validate base64url keys
+	if _, err := base64.RawURLEncoding.DecodeString(sb.P256dh); err != nil {
+		l.Errorf("Invalid p256dh key (not valid base64url): %v", err)
+		return fmt.Errorf("invalid p256dh key: %w", err)
+	}
+
+	if _, err := base64.RawURLEncoding.DecodeString(sb.Auth); err != nil {
+		l.Errorf("Invalid auth key (not valid base64url): %v", err)
+		return fmt.Errorf("invalid auth key: %w", err)
+	}
 
 	sub := &webpush.Subscription{
 		Endpoint: sb.Endpoint,
@@ -59,12 +71,12 @@ func (s *NotificationService) sendToSubscriber(ctx context.Context, sb models.St
 
 	resp, err := webpush.SendNotification(payload, sub, opts)
 	if err != nil {
+		l.Errorf("webpush send failed: %v", err)
 		return fmt.Errorf("failed to send notification: %w", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
-	fmt.Println("response Body:", resp.Body)
+
+	l.Infof("Notification sent successfully: status=%d", resp.StatusCode)
 
 	return nil
 }

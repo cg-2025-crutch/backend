@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/cg-2025-crutch/backend/notification-service/internal/models"
-	"github.com/mailru/easyjson"
 )
 
 func (r *RedisRepo) GetSubscription(ctx context.Context, userUID string) (*models.StoredSubscription, error) {
@@ -16,7 +16,8 @@ func (r *RedisRepo) GetSubscription(ctx context.Context, userUID string) (*model
 	}
 
 	var sub models.StoredSubscription
-	err = easyjson.Unmarshal([]byte(result), &sub)
+	// Use standard json instead of easyjson to avoid base64url encoding issues
+	err = json.Unmarshal([]byte(result), &sub)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal subscription: %w", err)
 	}

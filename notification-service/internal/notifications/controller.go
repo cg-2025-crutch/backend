@@ -2,7 +2,6 @@ package notifications
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/cg-2025-crutch/backend/notification-service/internal/infrastructure/log"
@@ -65,10 +64,6 @@ func (c *Controller) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	fmt.Println(req.Endpoint)
-	fmt.Println(req.Keys.P256dh)
-	fmt.Println(req.Keys.Auth)
-
 	// Extract user ID from context or headers
 	// For now, using a header for user identification
 	userID := r.Header.Get("X-User-ID")
@@ -77,6 +72,16 @@ func (c *Controller) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID required in X-User-ID header", http.StatusBadRequest)
 		return
 	}
+
+	// Validate required fields
+	if req.Endpoint == "" || req.Keys.P256dh == "" || req.Keys.Auth == "" {
+		l.Error("missing required subscription fields")
+		http.Error(w, "Missing required fields: endpoint, keys.p256dh, keys.auth", http.StatusBadRequest)
+		return
+	}
+
+	l.Infof("Subscribing user: %s, p256dh length: %d, auth length: %d",
+		userID, len(req.Keys.P256dh), len(req.Keys.Auth))
 
 	err := c.service.SubscribeUser(ctx, userID, req.Endpoint, req.Keys.P256dh, req.Keys.Auth)
 	if err != nil {
