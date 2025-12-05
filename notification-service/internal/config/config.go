@@ -25,6 +25,8 @@ type RedisConfig struct {
 type ServerConfig struct {
 	GRPCHost string `env:"GRPC_HOST" envDefault:""`
 	GRPCPort string `env:"GRPC_PORT" envDefault:"50051"`
+	HTTPHost string `env:"HTTP_HOST" envDefault:""`
+	HTTPPort string `env:"HTTP_PORT" envDefault:"8080"`
 }
 
 type LoggerConfig struct {
@@ -42,6 +44,7 @@ type KafkaConfig struct {
 type NotificationsConfig struct {
 	VapidPublic  string `env:"VAPID_PUBLIC" envDefault:""`
 	VapidPrivate string `env:"VAPID_PRIVATE" envDefault:""`
+	Subscriber   string `env:"VAPID_SUBSCRIBER" envDefault:"mailto:admin@example.com"`
 }
 
 func New() (AppConfig, error) {

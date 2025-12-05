@@ -6,16 +6,17 @@ import (
 )
 
 type NotificationService struct {
-	repo            repository.RedisRepo
+	repo            repository.RedisReporer
 	VapidPublicKey  string
 	VapidPrivateKey string
 	subscriber      string
 }
 
-func NewNotificationService(cfg config.NotificationsConfig, repo repository.RedisRepo) NotificationService {
-	return NotificationService{
+func NewNotificationService(cfg config.NotificationsConfig, repo *repository.RedisRepo) *NotificationService {
+	return &NotificationService{
 		repo:            repo,
 		VapidPublicKey:  cfg.VapidPublic,
 		VapidPrivateKey: cfg.VapidPrivate,
+		subscriber:      cfg.Subscriber,
 	}
 }
