@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/cg-2025-crutch/backend/notification-service/internal/infrastructure/log"
@@ -63,6 +64,10 @@ func (c *Controller) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+
+	fmt.Println(req.Endpoint)
+	fmt.Println(req.Keys.P256dh)
+	fmt.Println(req.Keys.Auth)
 
 	// Extract user ID from context or headers
 	// For now, using a header for user identification
