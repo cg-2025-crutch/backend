@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/SherClockHolmes/webpush-go"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/adapters/consumer"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/config"
 	"github.com/cg-2025-crutch/backend/notification-service/internal/infrastructure/kafka"
@@ -77,12 +76,6 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	privateKey, publicKey, err := webpush.GenerateVAPIDKeys()
-
-	fmt.Println("VAPID_PRIVATE_KEY =", privateKey)
-	fmt.Println("VAPID_PUBLIC_KEY  =", publicKey)
-
-	// Start HTTP server in a goroutine
 	go func() {
 		logger.Infof("HTTP server listening on %s", serverAddr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -90,7 +83,6 @@ func main() {
 		}
 	}()
 
-	// Initialize Kafka consumer
 	kafkaConsumer, err := kafka.InitKafkaConsumer(ctx, "notification-consumer", cfg.Kafka)
 	if err != nil {
 		logger.Fatal("failed to initialize Kafka consumer", zap.Error(err))
