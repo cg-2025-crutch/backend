@@ -43,7 +43,6 @@ func (s *NotificationService) sendToSubscriber(ctx context.Context, sb models.St
 	l.Infof("stored subscriber p256 length: %d, value: %s", len(sb.P256dh), sb.P256dh)
 	l.Infof("stored subscriber auth length: %d, value: %s", len(sb.Auth), sb.Auth)
 
-	// Validate base64url keys
 	if _, err := base64.RawURLEncoding.DecodeString(sb.P256dh); err != nil {
 		l.Errorf("Invalid p256dh key (not valid base64url): %v", err)
 		return fmt.Errorf("invalid p256dh key: %w", err)
