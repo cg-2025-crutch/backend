@@ -12,6 +12,7 @@ type AppConfig struct {
 	Server   ServerConfig
 	Logger   LoggerConfig
 	Postgres PostgresConfig
+	Kafka    KafkaConfig
 }
 
 type ServerConfig struct {
@@ -34,6 +35,13 @@ type PostgresConfig struct {
 type LoggerConfig struct {
 	Development bool `env:"LOG_DEV" envDefault:"false"`
 	Caller      bool `env:"LOG_CALLER" envDefault:"false"`
+}
+
+type KafkaConfig struct {
+	Brokers      []string      `env:"KAFKA_BROKERS" env-required:"true"`
+	ConsTopic    []string      `env:"KAFKA_CONS_TOPIC" env-required:"true"`
+	ProdTopic    string        `env:"KAFKA_PROD_TOPIC" env-required:"true"`
+	ConnDeadline time.Duration `env:"KAFKA_CONN_DEADLINE" envDefault:"10s"`
 }
 
 func New() (AppConfig, error) {
