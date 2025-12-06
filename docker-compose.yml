@@ -71,11 +71,26 @@ services:
     container_name: ns-service
     ports:
       - "50051:50051"
-      - "8080:8080"
     depends_on:
       - ns-kafka
     networks:
       ns:
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - us-service
+      - fs-service
+      - ns-service
+    networks:
+      - us
+      - fs
+      - ns
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
