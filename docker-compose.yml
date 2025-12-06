@@ -13,6 +13,20 @@ services:
     networks:
       us:
 
+  fs-db:
+    image: postgres:12
+    container_name: fs-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: dbfunds
+    ports:
+      - "5433:5432"
+    volumes:
+      - fs-db_data:/var/lib/postgresql/data
+    networks:
+      fs:
+
   us-service:
     build:
       context: ./user-service
@@ -25,6 +39,17 @@ services:
     networks:
       us:
 
+  fs-service:
+    build:
+      context: ./funds-service
+      dockerfile: Dockerfile
+    container_name: fs-service
+    ports:
+      - "50053:50053"
+    depends_on:
+      - fs-db
+    networks:
+      fs:
 
   ns-redis:
     container_name: ns-redis
@@ -62,6 +87,7 @@ services:
       - "2181:2181"
     networks:
       ns:
+      fs:
 
   ns-kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -79,6 +105,7 @@ services:
       - "9092:9092"
     networks:
       ns:
+      fs:
 
   akhq:
     image: tchiotludo/akhq
@@ -102,8 +129,10 @@ services:
 
 volumes:
   us-db_data:
+  fs-db_data:
   redis_data:
 
 networks:
   ns:
   us:
+  fs:
