@@ -1,0 +1,109 @@
+services:
+  us-db:
+    image: postgres:12
+    container_name: us-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: dbusers
+    ports:
+      - "5432:5432"
+    volumes:
+      - us-db_data:/var/lib/postgresql/data
+    networks:
+      us:
+
+  us-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: us-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      - us-db
+    networks:
+      us:
+
+
+  ns-redis:
+    container_name: ns-redis
+    image: redis:8.2.1-alpine
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "1234"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    environment:
+      CACHE_PASSWORD: 1234
+    networks:
+      ns:
+
+  ns-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: ns-service
+    ports:
+      - "50051:50051"
+      - "8080:8080"
+    depends_on:
+      - ns-kafka
+    networks:
+      ns:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      ns:
+
+  ns-kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_DOCKER://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      ns:
+
+  akhq:
+    image: tchiotludo/akhq
+    container_name: akhq
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - ns-kafka
+    networks:
+      ns:
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          server:
+            access-log: true
+          connections:
+            local:
+              properties:
+                bootstrap.servers: "ns-kafka:29092"
+
+volumes:
+  us-db_data:
+  redis_data:
+
+networks:
+  ns:
+  us:
