@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package notification.v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/cg-2025-crutch/backend/notification-service/internal/grpc/gen";
+
+service NotificationService {
+  rpc GetVapidKey(google.protobuf.Empty) returns (GetVapidKeyResponse);
+  rpc Subscribe(SubscribeReq) returns (SubscribeResp);
+}
+
+message GetVapidKeyResponse {
+  string vapid_key = 1;
+}
+
+message SubscribeReq {
+  string user_id = 1;
+  string endpoint = 2;
+  string p256dh = 3;
+  string auth = 4;
+}
+
+message SubscribeResp {
+  string message = 1;
+}
