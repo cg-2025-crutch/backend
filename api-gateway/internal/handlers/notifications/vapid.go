@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+// GetVapidKey godoc
+// @Summary Получить VAPID ключ
+// @Description Получает публичный VAPID ключ для push-уведомлений
+// @Tags notifications
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "VAPID ключ"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /notifications/vapid-key [get]
 func (h *NotificationsHandler) GetVapidKey(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 10*time.Second)
 	defer cancel()

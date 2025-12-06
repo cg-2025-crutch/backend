@@ -10,11 +10,23 @@ import (
 )
 
 type SubscribeRequest struct {
-	Endpoint string `json:"endpoint" validate:"required"`
-	P256dh   string `json:"p256dh" validate:"required"`
-	Auth     string `json:"auth" validate:"required"`
+	Endpoint string `json:"endpoint" validate:"required" example:"https://fcm.googleapis.com/fcm/send/..."`
+	P256dh   string `json:"p256dh" validate:"required" example:"BPxY..."`
+	Auth     string `json:"auth" validate:"required" example:"xyz123..."`
 }
 
+// Subscribe godoc
+// @Summary Подписаться на уведомления
+// @Description Подписывает пользователя на push-уведомления
+// @Tags notifications
+// @Accept json
+// @Produce json
+// @Param request body SubscribeRequest true "Данные подписки"
+// @Success 200 {object} map[string]interface{} "Успешная подписка"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /notifications/subscribe [post]
 func (h *NotificationsHandler) Subscribe(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 

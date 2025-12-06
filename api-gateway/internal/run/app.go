@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/cg-2025-crutch/backend/api-gateway/docs"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/clients"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/config"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/handlers/funds"
@@ -18,6 +19,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+
 	"go.uber.org/zap"
 )
 

@@ -10,14 +10,28 @@ import (
 )
 
 type UpdateUserRequest struct {
-	Username     string  `json:"username"`
-	FirstName    string  `json:"first_name"`
-	SecondName   string  `json:"second_name"`
-	Age          int32   `json:"age"`
-	Salary       float64 `json:"salary"`
-	WorkSphereId int64   `json:"work_sphere_id"`
+	Username     string  `json:"username" example:"john_doe"`
+	FirstName    string  `json:"first_name" example:"John"`
+	SecondName   string  `json:"second_name" example:"Doe"`
+	Age          int32   `json:"age" example:"26"`
+	Salary       float64 `json:"salary" example:"55000"`
+	WorkSphereId int64   `json:"work_sphere_id" example:"2"`
 }
 
+// UpdateUser godoc
+// @Summary Обновить профиль пользователя
+// @Description Обновляет информацию о пользователе (только свой профиль)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path string true "ID пользователя"
+// @Param request body UpdateUserRequest true "Обновленные данные пользователя"
+// @Success 200 {object} map[string]interface{} "Пользователь успешно обновлен"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 403 {object} map[string]interface{} "Можно обновлять только свой профиль"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /users/{id} [put]
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userID := c.Params("id")
 	if userID == "" {

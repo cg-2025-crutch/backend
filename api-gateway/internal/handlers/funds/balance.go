@@ -9,6 +9,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// GetUserBalance godoc
+// @Summary Получить баланс пользователя
+// @Description Получает текущий баланс пользователя
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Баланс пользователя"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/balance [get]
 func (h *FundsHandler) GetUserBalance(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 

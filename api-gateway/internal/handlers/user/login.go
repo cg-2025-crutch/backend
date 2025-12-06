@@ -9,10 +9,21 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Username string `json:"username" validate:"required" example:"john_doe"`
+	Password string `json:"password" validate:"required" example:"password123"`
 }
 
+// Login godoc
+// @Summary Вход в систему
+// @Description Аутентификация пользователя и получение токенов доступа
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Данные для входа"
+// @Success 200 {object} map[string]interface{} "Успешная аутентификация"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 401 {object} map[string]interface{} "Неверные учетные данные"
+// @Router /users/login [post]
 func (h *UserHandler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {

@@ -11,14 +11,26 @@ import (
 )
 
 type CreateTransactionRequest struct {
-	CategoryId      int32   `json:"category_id" validate:"required"`
-	Type            string  `json:"type" validate:"required,oneof=income expense"`
-	Amount          float64 `json:"amount" validate:"required,gt=0"`
-	Title           string  `json:"title" validate:"required"`
-	Description     string  `json:"description"`
-	TransactionDate string  `json:"transaction_date" validate:"required"` // YYYY-MM-DD
+	CategoryId      int32   `json:"category_id" validate:"required" example:"1"`
+	Type            string  `json:"type" validate:"required,oneof=income expense" example:"income"`
+	Amount          float64 `json:"amount" validate:"required,gt=0" example:"1000.50"`
+	Title           string  `json:"title" validate:"required" example:"Зарплата"`
+	Description     string  `json:"description" example:"Месячная зарплата"`
+	TransactionDate string  `json:"transaction_date" validate:"required" example:"2025-12-06"` // YYYY-MM-DD
 }
 
+// CreateTransaction godoc
+// @Summary Создать транзакцию
+// @Description Создает новую финансовую транзакцию для пользователя
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param request body CreateTransactionRequest true "Данные транзакции"
+// @Success 201 {object} map[string]interface{} "Транзакция успешно создана"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/transactions [post]
 func (h *FundsHandler) CreateTransaction(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 
@@ -52,6 +64,18 @@ func (h *FundsHandler) CreateTransaction(c *fiber.Ctx) error {
 	})
 }
 
+// GetTransactionById godoc
+// @Summary Получить транзакцию по ID
+// @Description Получает информацию о транзакции по ее ID
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param id path int true "ID транзакции"
+// @Success 200 {object} map[string]interface{} "Информация о транзакции"
+// @Failure 400 {object} map[string]interface{} "Неверный ID транзакции"
+// @Failure 404 {object} map[string]interface{} "Транзакция не найдена"
+// @Security BearerAuth
+// @Router /funds/transactions/{id} [get]
 func (h *FundsHandler) GetTransactionById(c *fiber.Ctx) error {
 	transactionIDStr := c.Params("id")
 	transactionID, err := strconv.ParseInt(transactionIDStr, 10, 64)
@@ -78,6 +102,18 @@ func (h *FundsHandler) GetTransactionById(c *fiber.Ctx) error {
 	})
 }
 
+// GetUserTransactions godoc
+// @Summary Получить транзакции пользователя
+// @Description Получает список всех транзакций пользователя с пагинацией
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param limit query int false "Лимит транзакций" default(10)
+// @Param offset query int false "Смещение" default(0)
+// @Success 200 {object} map[string]interface{} "Список транзакций"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/transactions [get]
 func (h *FundsHandler) GetUserTransactions(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 
@@ -104,6 +140,19 @@ func (h *FundsHandler) GetUserTransactions(c *fiber.Ctx) error {
 	})
 }
 
+// GetUserTransactionsByPeriod godoc
+// @Summary Получить транзакции за период
+// @Description Получает транзакции пользователя за указанное количество дней
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param days query int false "Количество дней" default(30)
+// @Param limit query int false "Лимит транзакций" default(10)
+// @Param offset query int false "Смещение" default(0)
+// @Success 200 {object} map[string]interface{} "Список транзакций за период"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/transactions/period [get]
 func (h *FundsHandler) GetUserTransactionsByPeriod(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 
@@ -133,14 +182,27 @@ func (h *FundsHandler) GetUserTransactionsByPeriod(c *fiber.Ctx) error {
 }
 
 type UpdateTransactionRequest struct {
-	CategoryId      int32   `json:"category_id"`
-	Type            string  `json:"type"`
-	Amount          float64 `json:"amount"`
-	Title           string  `json:"title"`
-	Description     string  `json:"description"`
-	TransactionDate string  `json:"transaction_date"`
+	CategoryId      int32   `json:"category_id" example:"2"`
+	Type            string  `json:"type" example:"expense"`
+	Amount          float64 `json:"amount" example:"500.00"`
+	Title           string  `json:"title" example:"Продукты"`
+	Description     string  `json:"description" example:"Покупка продуктов"`
+	TransactionDate string  `json:"transaction_date" example:"2025-12-06"`
 }
 
+// UpdateTransaction godoc
+// @Summary Обновить транзакцию
+// @Description Обновляет информацию о транзакции
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param id path int true "ID транзакции"
+// @Param request body UpdateTransactionRequest true "Обновленные данные транзакции"
+// @Success 200 {object} map[string]interface{} "Транзакция успешно обновлена"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/transactions/{id} [put]
 func (h *FundsHandler) UpdateTransaction(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 
@@ -183,6 +245,18 @@ func (h *FundsHandler) UpdateTransaction(c *fiber.Ctx) error {
 	})
 }
 
+// DeleteTransaction godoc
+// @Summary Удалить транзакцию
+// @Description Удаляет транзакцию по ее ID
+// @Tags funds
+// @Accept json
+// @Produce json
+// @Param id path int true "ID транзакции"
+// @Success 200 {object} map[string]interface{} "Транзакция успешно удалена"
+// @Failure 400 {object} map[string]interface{} "Неверный ID транзакции"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Security BearerAuth
+// @Router /funds/transactions/{id} [delete]
 func (h *FundsHandler) DeleteTransaction(c *fiber.Ctx) error {
 	userID := c.Locals(middleware.UserIDKey).(string)
 

@@ -1,0 +1,721 @@
+basePath: /api/v1
+definitions:
+  internal_handlers_funds.CreateTransactionRequest:
+    properties:
+      amount:
+        example: 1000.5
+        type: number
+      category_id:
+        example: 1
+        type: integer
+      description:
+        example: Месячная зарплата
+        type: string
+      title:
+        example: Зарплата
+        type: string
+      transaction_date:
+        description: YYYY-MM-DD
+        example: "2025-12-06"
+        type: string
+      type:
+        enum:
+        - income
+        - expense
+        example: income
+        type: string
+    required:
+    - amount
+    - category_id
+    - title
+    - transaction_date
+    - type
+    type: object
+  internal_handlers_funds.UpdateTransactionRequest:
+    properties:
+      amount:
+        example: 500
+        type: number
+      category_id:
+        example: 2
+        type: integer
+      description:
+        example: Покупка продуктов
+        type: string
+      title:
+        example: Продукты
+        type: string
+      transaction_date:
+        example: "2025-12-06"
+        type: string
+      type:
+        example: expense
+        type: string
+    type: object
+  internal_handlers_notifications.SubscribeRequest:
+    properties:
+      auth:
+        example: xyz123...
+        type: string
+      endpoint:
+        example: https://fcm.googleapis.com/fcm/send/...
+        type: string
+      p256dh:
+        example: BPxY...
+        type: string
+    required:
+    - auth
+    - endpoint
+    - p256dh
+    type: object
+  internal_handlers_user.CreateUserRequest:
+    properties:
+      age:
+        example: 25
+        minimum: 18
+        type: integer
+      first_name:
+        example: John
+        type: string
+      password:
+        example: password123
+        minLength: 6
+        type: string
+      salary:
+        example: 50000
+        minimum: 0
+        type: number
+      second_name:
+        example: Doe
+        type: string
+      username:
+        example: john_doe
+        type: string
+      work_sphere_id:
+        example: 1
+        type: integer
+    required:
+    - age
+    - first_name
+    - password
+    - salary
+    - second_name
+    - username
+    - work_sphere_id
+    type: object
+  internal_handlers_user.LoginRequest:
+    properties:
+      password:
+        example: password123
+        type: string
+      username:
+        example: john_doe
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  internal_handlers_user.UpdateUserRequest:
+    properties:
+      age:
+        example: 26
+        type: integer
+      first_name:
+        example: John
+        type: string
+      salary:
+        example: 55000
+        type: number
+      second_name:
+        example: Doe
+        type: string
+      username:
+        example: john_doe
+        type: string
+      work_sphere_id:
+        example: 2
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API Gateway для управления пользователями, финансами и уведомлениями
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: API Gateway
+  version: "1.0"
+paths:
+  /funds/balance:
+    get:
+      consumes:
+      - application/json
+      description: Получает текущий баланс пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Баланс пользователя
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить баланс пользователя
+      tags:
+      - funds
+  /funds/categories:
+    get:
+      consumes:
+      - application/json
+      description: Получает список всех категорий транзакций
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список категорий
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить все категории
+      tags:
+      - funds
+  /funds/categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию о категории по ее ID
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о категории
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный ID категории
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Категория не найдена
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить категорию по ID
+      tags:
+      - funds
+  /funds/categories/type/{type}:
+    get:
+      consumes:
+      - application/json
+      description: Получает список категорий по типу (income или expense)
+      parameters:
+      - description: Тип категории (income или expense)
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список категорий
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный тип категории
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить категории по типу
+      tags:
+      - funds
+  /funds/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Получает список всех транзакций пользователя с пагинацией
+      parameters:
+      - default: 10
+        description: Лимит транзакций
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список транзакций
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить транзакции пользователя
+      tags:
+      - funds
+    post:
+      consumes:
+      - application/json
+      description: Создает новую финансовую транзакцию для пользователя
+      parameters:
+      - description: Данные транзакции
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_funds.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Транзакция успешно создана
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Создать транзакцию
+      tags:
+      - funds
+  /funds/transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет транзакцию по ее ID
+      parameters:
+      - description: ID транзакции
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Транзакция успешно удалена
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный ID транзакции
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Удалить транзакцию
+      tags:
+      - funds
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию о транзакции по ее ID
+      parameters:
+      - description: ID транзакции
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о транзакции
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный ID транзакции
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Транзакция не найдена
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить транзакцию по ID
+      tags:
+      - funds
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о транзакции
+      parameters:
+      - description: ID транзакции
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные транзакции
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_funds.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Транзакция успешно обновлена
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить транзакцию
+      tags:
+      - funds
+  /funds/transactions/period:
+    get:
+      consumes:
+      - application/json
+      description: Получает транзакции пользователя за указанное количество дней
+      parameters:
+      - default: 30
+        description: Количество дней
+        in: query
+        name: days
+        type: integer
+      - default: 10
+        description: Лимит транзакций
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список транзакций за период
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить транзакции за период
+      tags:
+      - funds
+  /notifications/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Подписывает пользователя на push-уведомления
+      parameters:
+      - description: Данные подписки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_notifications.SubscribeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная подписка
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Подписаться на уведомления
+      tags:
+      - notifications
+  /notifications/vapid-key:
+    get:
+      consumes:
+      - application/json
+      description: Получает публичный VAPID ключ для push-уведомлений
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: VAPID ключ
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить VAPID ключ
+      tags:
+      - notifications
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию о пользователе по его ID
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о пользователе
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: ID пользователя обязателен
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Пользователь не найден
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить пользователя по ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о пользователе (только свой профиль)
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Обновленные данные пользователя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь успешно обновлен
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Можно обновлять только свой профиль
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить профиль пользователя
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Аутентификация пользователя и получение токенов доступа
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_user.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная аутентификация
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Неверные учетные данные
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Вход в систему
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя в системе
+      parameters:
+      - description: Данные нового пользователя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers_user.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Пользователь успешно создан
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Неверный формат запроса
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Регистрация нового пользователя
+      tags:
+      - users
+  /users/username/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Получает информацию о пользователе по его username
+      parameters:
+      - description: Имя пользователя
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о пользователе
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Username обязателен
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Пользователь не найден
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить пользователя по имени
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

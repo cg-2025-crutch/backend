@@ -9,15 +9,26 @@ import (
 )
 
 type CreateUserRequest struct {
-	Username     string  `json:"username" validate:"required"`
-	Password     string  `json:"password" validate:"required,min=6"`
-	FirstName    string  `json:"first_name" validate:"required"`
-	SecondName   string  `json:"second_name" validate:"required"`
-	Age          int32   `json:"age" validate:"required,min=18"`
-	Salary       float64 `json:"salary" validate:"required,min=0"`
-	WorkSphereId int64   `json:"work_sphere_id" validate:"required"`
+	Username     string  `json:"username" validate:"required" example:"john_doe"`
+	Password     string  `json:"password" validate:"required,min=6" example:"password123"`
+	FirstName    string  `json:"first_name" validate:"required" example:"John"`
+	SecondName   string  `json:"second_name" validate:"required" example:"Doe"`
+	Age          int32   `json:"age" validate:"required,min=18" example:"25"`
+	Salary       float64 `json:"salary" validate:"required,min=0" example:"50000"`
+	WorkSphereId int64   `json:"work_sphere_id" validate:"required" example:"1"`
 }
 
+// CreateUser godoc
+// @Summary Регистрация нового пользователя
+// @Description Создает нового пользователя в системе
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body CreateUserRequest true "Данные нового пользователя"
+// @Success 201 {object} map[string]interface{} "Пользователь успешно создан"
+// @Failure 400 {object} map[string]interface{} "Неверный формат запроса"
+// @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
+// @Router /users/register [post]
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var req CreateUserRequest
 	if err := c.BodyParser(&req); err != nil {
