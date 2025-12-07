@@ -46,8 +46,13 @@ services:
     container_name: fs-service
     ports:
       - "50053:50053"
+    environment:
+      KAFKA_BROKERS: ns-kafka:29092
+      KAFKA_PROD_TOPIC: analytics
+      KAFKA_CONS_TOPIC: ""
     depends_on:
       - fs-db
+      - ns-kafka
     networks:
       fs:
 
@@ -76,6 +81,23 @@ services:
     networks:
       ns:
 
+  as-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: as-service
+    ports:
+      - "50054:50054"
+    depends_on:
+      - ns-kafka
+      - us-service
+      - fs-service
+      - ns-redis
+    networks:
+      - ns
+      - us
+      - fs
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -87,6 +109,7 @@ services:
       - us-service
       - fs-service
       - ns-service
+      - as-service
     networks:
       - us
       - fs
@@ -103,6 +126,7 @@ services:
     networks:
       ns:
       fs:
+      us:
 
   ns-kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -112,7 +136,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_DOCKER://kafka:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_DOCKER://ns-kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -121,6 +145,7 @@ services:
     networks:
       ns:
       fs:
+      us:
 
   akhq:
     image: tchiotludo/akhq

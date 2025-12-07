@@ -38,9 +38,9 @@ type LoggerConfig struct {
 }
 
 type KafkaConfig struct {
-	Brokers      []string      `env:"KAFKA_BROKERS" env-required:"true"`
-	ConsTopic    []string      `env:"KAFKA_CONS_TOPIC" env-required:"true"`
-	ProdTopic    string        `env:"KAFKA_PROD_TOPIC" env-required:"true"`
+	Brokers      []string      `env:"KAFKA_BROKERS" envDefault:"localhost:9092" envSeparator:","`
+	ConsTopic    []string      `env:"KAFKA_CONS_TOPIC" envSeparator:","`
+	ProdTopic    string        `env:"KAFKA_PROD_TOPIC" envDefault:"analytics"`
 	ConnDeadline time.Duration `env:"KAFKA_CONN_DEADLINE" envDefault:"10s"`
 }
 

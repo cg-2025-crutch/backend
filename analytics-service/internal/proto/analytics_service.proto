@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package analytics_service;
+
+option go_package = "github.com/cg-2025-crutch/backend/funds-service/internal/grpc/gen";
+
+service AnalyticsService {
+  rpc GetRecommendations (GetRecommendationsReq) returns (GetRecommendationsResp);
+}
+
+message GetRecommendationsReq {
+  string user_uid = 1;
+}
+
+message CategoryRecommendation {
+  string category_name = 1;          // Название категории
+  double actual_amount = 2;          // Фактическая сумма расходов
+  double actual_percentage = 3;      // Фактический процент от зарплаты
+  double recommended_min = 4;        // Минимальная рекомендуемая граница (%)
+  double recommended_max = 5;        // Максимальная рекомендуемая граница (%)
+  string status = 6;                 // excellent, normal, warning, critical
+  string message = 7;                // Текстовое сообщение для пользователя
+  double deviation = 8;              // Отклонение от нормы (может быть отрицательным)
+}
+
+message GetRecommendationsResp {
+  string user_uid = 1;
+  double salary = 2;
+  string salary_bracket = 3;         // "0-20000", "20000-50000" и т.д.
+  int32 total_categories = 4;
+  int32 excellent_count = 5;
+  int32 normal_count = 6;
+  int32 warning_count = 7;
+  int32 critical_count = 8;
+  string overall_status = 9;         // "excellent", "good", "attention_required", "critical"
+  string overall_message = 10;       // Общее сообщение
+  repeated CategoryRecommendation recommendations = 11;
+  int64 calculated_at = 12;          // Unix timestamp
+}
+

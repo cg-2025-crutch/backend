@@ -42,7 +42,6 @@ func (cons *NotificationConsumer) ConsumeClaim(s sarama.ConsumerGroupSession, c 
 			l.Infof("Message received: topic=%s, partition=%d, offset=%d",
 				msg.Topic, msg.Partition, msg.Offset)
 
-			// Deserialize the Kafka message
 			var kafkaMsg models.KafkaNotificationMessage
 			if err := easyjson.Unmarshal(msg.Value, &kafkaMsg); err != nil {
 				l.Errorf("Failed to unmarshal Kafka message: %v", err)
@@ -55,10 +54,8 @@ func (cons *NotificationConsumer) ConsumeClaim(s sarama.ConsumerGroupSession, c 
 			l.Infof("Processing notification for user: %s, title: %s",
 				kafkaMsg.UserUID, kafkaMsg.Notification.Title)
 
-			// Send notification using the service
 			if err := cons.service.SendNotification(s.Context(), kafkaMsg.UserUID, kafkaMsg.Notification); err != nil {
 				l.Errorf("Failed to send notification: %v", err)
-				// Still mark as processed to avoid reprocessing
 				s.MarkMessage(msg, "")
 				s.Commit()
 				continue
@@ -66,7 +63,6 @@ func (cons *NotificationConsumer) ConsumeClaim(s sarama.ConsumerGroupSession, c 
 
 			l.Infof("Successfully sent notification to user: %s", kafkaMsg.UserUID)
 
-			// Mark message as processed
 			s.MarkMessage(msg, "")
 			s.Commit()
 

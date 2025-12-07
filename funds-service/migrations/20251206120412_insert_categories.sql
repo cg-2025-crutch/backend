@@ -10,6 +10,7 @@ INSERT INTO categories (name, type, icon) VALUES
     
     -- Expense categories
     ('Продукты', 'expense', '🛒'),
+    ('Выплаты по кредитам', 'expense',''),
     ('Транспорт', 'expense', '🚗'),
     ('Жилье', 'expense', '🏠'),
     ('Коммунальные услуги', 'expense', '💡'),
