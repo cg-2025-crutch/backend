@@ -9,10 +9,11 @@ import (
 )
 
 type AppConfig struct {
-	Server             ServerConfig
-	UserServiceClient  ServiceClientConfig
-	FundsServiceClient ServiceClientConfig
-	NotifServiceClient ServiceClientConfig
+	Server                 ServerConfig
+	UserServiceClient      ServiceClientConfig
+	FundsServiceClient     ServiceClientConfig
+	NotifServiceClient     ServiceClientConfig
+	AnalyticsServiceClient ServiceClientConfig
 }
 
 type ServerConfig struct {
@@ -58,6 +59,14 @@ func New() (AppConfig, error) {
 	})
 	if err != nil {
 		return AppConfig{}, fmt.Errorf("error parsing notification service config: %w", err)
+	}
+
+	// Parse analytics service config
+	err = env.ParseWithOptions(&cfg.AnalyticsServiceClient, env.Options{
+		Prefix: "ANALYTICS_SERVICE_",
+	})
+	if err != nil {
+		return AppConfig{}, fmt.Errorf("error parsing analytics service config: %w", err)
 	}
 
 	return cfg, nil

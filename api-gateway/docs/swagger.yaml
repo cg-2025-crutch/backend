@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  internal_handlers_funds.CreateTransactionRequest:
+  funds.CreateTransactionRequest:
     properties:
       amount:
         example: 1000.5
@@ -31,7 +31,7 @@ definitions:
     - transaction_date
     - type
     type: object
-  internal_handlers_funds.UpdateTransactionRequest:
+  funds.UpdateTransactionRequest:
     properties:
       amount:
         example: 500
@@ -51,22 +51,6 @@ definitions:
       type:
         example: expense
         type: string
-    type: object
-  internal_handlers_notifications.SubscribeRequest:
-    properties:
-      auth:
-        example: xyz123...
-        type: string
-      endpoint:
-        example: https://fcm.googleapis.com/fcm/send/...
-        type: string
-      p256dh:
-        example: BPxY...
-        type: string
-    required:
-    - auth
-    - endpoint
-    - p256dh
     type: object
   internal_handlers_user.CreateUserRequest:
     properties:
@@ -136,6 +120,22 @@ definitions:
         example: 2
         type: integer
     type: object
+  notifications.SubscribeRequest:
+    properties:
+      auth:
+        example: xyz123...
+        type: string
+      endpoint:
+        example: https://fcm.googleapis.com/fcm/send/...
+        type: string
+      p256dh:
+        example: BPxY...
+        type: string
+    required:
+    - auth
+    - endpoint
+    - p256dh
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -149,6 +149,30 @@ info:
   title: API Gateway
   version: "1.0"
 paths:
+  /analytics/recommendations:
+    get:
+      consumes:
+      - application/json
+      description: Получает финансовые рекомендации для пользователя на основе его
+        транзакций и категорий расходов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Рекомендации пользователя
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить рекомендации пользователя
+      tags:
+      - analytics
   /funds/balance:
     get:
       consumes:
@@ -307,7 +331,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers_funds.CreateTransactionRequest'
+          $ref: '#/definitions/funds.CreateTransactionRequest'
       produces:
       - application/json
       responses:
@@ -413,7 +437,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers_funds.UpdateTransactionRequest'
+          $ref: '#/definitions/funds.UpdateTransactionRequest'
       produces:
       - application/json
       responses:
@@ -487,7 +511,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_handlers_notifications.SubscribeRequest'
+          $ref: '#/definitions/notifications.SubscribeRequest'
       produces:
       - application/json
       responses:

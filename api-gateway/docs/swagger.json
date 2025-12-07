@@ -17,6 +17,66 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
+        "/analytics/recommendations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Получает финансовые рекомендации для пользователя на основе его транзакций и категорий расходов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "analytics"
+                ],
+                "summary": "Получить рекомендации пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Рекомендации пользователя",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                "salary": 50000,
+                                "salary_bracket": "medium",
+                                "total_categories": 5,
+                                "excellent_count": 2,
+                                "normal_count": 2,
+                                "warning_count": 1,
+                                "critical_count": 0,
+                                "overall_status": "normal",
+                                "overall_message": "Ваши финансы в порядке",
+                                "recommendations": [
+                                    "Рекомендуется сократить расходы на развлечения",
+                                    "Рассмотрите возможность создания резервного фонда"
+                                ],
+                                "calculated_at": 1701878400
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/funds/balance": {
             "get": {
                 "security": [
@@ -41,6 +101,18 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "balance": {
+                                    "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                    "total_balance": 25000.50,
+                                    "total_income": 50000.00,
+                                    "total_expense": 25000.50,
+                                    "last_transaction_at": 1701878400,
+                                    "updated_at": 1701878400
+                                }
+                            }
                         }
                     },
                     "500": {
@@ -48,6 +120,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -77,6 +154,33 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "categories": [
+                                    {
+                                        "id": 1,
+                                        "name": "Зарплата",
+                                        "type": "income",
+                                        "icon": "💰",
+                                        "created_at": 1701878400
+                                    },
+                                    {
+                                        "id": 2,
+                                        "name": "Продукты",
+                                        "type": "expense",
+                                        "icon": "🛒",
+                                        "created_at": 1701878400
+                                    },
+                                    {
+                                        "id": 3,
+                                        "name": "Транспорт",
+                                        "type": "expense",
+                                        "icon": "🚗",
+                                        "created_at": 1701878400
+                                    }
+                                ]
+                            }
                         }
                     },
                     "500": {
@@ -84,6 +188,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -122,6 +231,26 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "categories": [
+                                    {
+                                        "id": 1,
+                                        "name": "Зарплата",
+                                        "type": "income",
+                                        "icon": "💰",
+                                        "created_at": 1701878400
+                                    },
+                                    {
+                                        "id": 4,
+                                        "name": "Дивиденды",
+                                        "type": "income",
+                                        "icon": "📈",
+                                        "created_at": 1701878400
+                                    }
+                                ]
+                            }
                         }
                     },
                     "400": {
@@ -129,6 +258,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid category type"
+                            }
                         }
                     },
                     "500": {
@@ -136,6 +270,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -174,6 +313,17 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "category": {
+                                    "id": 1,
+                                    "name": "Зарплата",
+                                    "type": "income",
+                                    "icon": "💰",
+                                    "created_at": 1701878400
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -181,6 +331,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid category id"
+                            }
                         }
                     },
                     "404": {
@@ -188,6 +343,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "category not found"
+                            }
                         }
                     }
                 }
@@ -233,6 +393,51 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "transactions": [
+                                    {
+                                        "id": 1,
+                                        "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                        "category_id": 1,
+                                        "type": "income",
+                                        "amount": 50000.00,
+                                        "title": "Зарплата",
+                                        "description": "Месячная зарплата",
+                                        "transaction_date": "2025-12-06",
+                                        "created_at": 1701878400,
+                                        "updated_at": 1701878400,
+                                        "category": {
+                                            "id": 1,
+                                            "name": "Зарплата",
+                                            "type": "income",
+                                            "icon": "💰",
+                                            "created_at": 1701878400
+                                        }
+                                    },
+                                    {
+                                        "id": 2,
+                                        "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                        "category_id": 2,
+                                        "type": "expense",
+                                        "amount": 5000.00,
+                                        "title": "Продукты",
+                                        "description": "Покупка продуктов на неделю",
+                                        "transaction_date": "2025-12-05",
+                                        "created_at": 1701792000,
+                                        "updated_at": 1701792000,
+                                        "category": {
+                                            "id": 2,
+                                            "name": "Продукты",
+                                            "type": "expense",
+                                            "icon": "🛒",
+                                            "created_at": 1701878400
+                                        }
+                                    }
+                                ],
+                                "total": 2
+                            }
                         }
                     },
                     "500": {
@@ -240,6 +445,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -268,7 +478,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_funds.CreateTransactionRequest"
+                            "$ref": "#/definitions/funds.CreateTransactionRequest"
                         }
                     }
                 ],
@@ -278,6 +488,22 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "transaction": {
+                                    "id": 1,
+                                    "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                    "category_id": 1,
+                                    "type": "income",
+                                    "amount": 1000.50,
+                                    "title": "Зарплата",
+                                    "description": "Месячная зарплата",
+                                    "transaction_date": "2025-12-06",
+                                    "created_at": 1701878400,
+                                    "updated_at": 1701878400
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -285,6 +511,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "500": {
@@ -292,6 +523,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -344,6 +580,25 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "transactions": [
+                                    {
+                                        "id": 1,
+                                        "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                        "category_id": 1,
+                                        "type": "income",
+                                        "amount": 50000.00,
+                                        "title": "Зарплата",
+                                        "description": "Месячная зарплата",
+                                        "transaction_date": "2025-12-06",
+                                        "created_at": 1701878400,
+                                        "updated_at": 1701878400
+                                    }
+                                ],
+                                "total": 1
+                            }
                         }
                     },
                     "500": {
@@ -351,6 +606,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -389,6 +649,29 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "transaction": {
+                                    "id": 1,
+                                    "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                    "category_id": 1,
+                                    "type": "income",
+                                    "amount": 1000.50,
+                                    "title": "Зарплата",
+                                    "description": "Месячная зарплата",
+                                    "transaction_date": "2025-12-06",
+                                    "created_at": 1701878400,
+                                    "updated_at": 1701878400,
+                                    "category": {
+                                        "id": 1,
+                                        "name": "Зарплата",
+                                        "type": "income",
+                                        "icon": "💰",
+                                        "created_at": 1701878400
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -396,6 +679,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid transaction id"
+                            }
                         }
                     },
                     "404": {
@@ -403,6 +691,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "transaction not found"
+                            }
                         }
                     }
                 }
@@ -438,7 +731,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_funds.UpdateTransactionRequest"
+                            "$ref": "#/definitions/funds.UpdateTransactionRequest"
                         }
                     }
                 ],
@@ -448,6 +741,22 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "transaction": {
+                                    "id": 1,
+                                    "user_uid": "550e8400-e29b-41d4-a716-446655440000",
+                                    "category_id": 2,
+                                    "type": "expense",
+                                    "amount": 500.00,
+                                    "title": "Продукты",
+                                    "description": "Покупка продуктов",
+                                    "transaction_date": "2025-12-06",
+                                    "created_at": 1701878400,
+                                    "updated_at": 1701878500
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -455,6 +764,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "500": {
@@ -462,6 +776,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -498,6 +817,12 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "success": true,
+                                "message": "Transaction deleted successfully"
+                            }
                         }
                     },
                     "400": {
@@ -505,6 +830,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid transaction id"
+                            }
                         }
                     },
                     "500": {
@@ -512,6 +842,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -542,7 +877,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_notifications.SubscribeRequest"
+                            "$ref": "#/definitions/notifications.SubscribeRequest"
                         }
                     }
                 ],
@@ -552,6 +887,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "message": "success"
+                            }
                         }
                     },
                     "400": {
@@ -559,6 +899,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "500": {
@@ -566,6 +911,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -595,6 +945,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "vapid_key": "BKxY1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                            }
                         }
                     },
                     "500": {
@@ -602,6 +957,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -637,6 +997,22 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                "expires_at": 1701964800,
+                                "user": {
+                                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                                    "username": "john_doe",
+                                    "first_name": "John",
+                                    "second_name": "Doe",
+                                    "age": 25,
+                                    "salary": 50000,
+                                    "work_sphere_id": 1
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -644,6 +1020,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "401": {
@@ -651,6 +1032,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid credentials"
+                            }
                         }
                     }
                 }
@@ -686,6 +1072,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "user": {
+                                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                                    "username": "john_doe",
+                                    "first_name": "John",
+                                    "second_name": "Doe",
+                                    "age": 25,
+                                    "salary": 50000,
+                                    "work_sphere_id": 1
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -693,6 +1092,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "500": {
@@ -700,6 +1104,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -738,6 +1147,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "user": {
+                                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                                    "username": "john_doe",
+                                    "first_name": "John",
+                                    "second_name": "Doe",
+                                    "age": 25,
+                                    "salary": 50000,
+                                    "work_sphere_id": 1
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -745,6 +1167,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "username is required"
+                            }
                         }
                     },
                     "404": {
@@ -752,6 +1179,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "user not found"
+                            }
                         }
                     }
                 }
@@ -790,6 +1222,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "user": {
+                                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                                    "username": "john_doe",
+                                    "first_name": "John",
+                                    "second_name": "Doe",
+                                    "age": 25,
+                                    "salary": 50000,
+                                    "work_sphere_id": 1
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -797,6 +1242,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "user id is required"
+                            }
                         }
                     },
                     "404": {
@@ -804,6 +1254,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "user not found"
+                            }
                         }
                     }
                 }
@@ -849,6 +1304,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "user": {
+                                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                                    "username": "john_doe",
+                                    "first_name": "John",
+                                    "second_name": "Doe",
+                                    "age": 26,
+                                    "salary": 55000,
+                                    "work_sphere_id": 2
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -856,6 +1324,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "invalid request body"
+                            }
                         }
                     },
                     "403": {
@@ -863,6 +1336,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "can only update own profile"
+                            }
                         }
                     },
                     "500": {
@@ -870,6 +1348,11 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "internal server error"
+                            }
                         }
                     }
                 }
@@ -877,7 +1360,7 @@
         }
     },
     "definitions": {
-        "internal_handlers_funds.CreateTransactionRequest": {
+        "funds.CreateTransactionRequest": {
             "type": "object",
             "required": [
                 "amount",
@@ -918,7 +1401,7 @@
                 }
             }
         },
-        "internal_handlers_funds.UpdateTransactionRequest": {
+        "funds.UpdateTransactionRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -944,28 +1427,6 @@
                 "type": {
                     "type": "string",
                     "example": "expense"
-                }
-            }
-        },
-        "internal_handlers_notifications.SubscribeRequest": {
-            "type": "object",
-            "required": [
-                "auth",
-                "endpoint",
-                "p256dh"
-            ],
-            "properties": {
-                "auth": {
-                    "type": "string",
-                    "example": "xyz123..."
-                },
-                "endpoint": {
-                    "type": "string",
-                    "example": "https://fcm.googleapis.com/fcm/send/..."
-                },
-                "p256dh": {
-                    "type": "string",
-                    "example": "BPxY..."
                 }
             }
         },
@@ -1057,6 +1518,28 @@
                 "work_sphere_id": {
                     "type": "integer",
                     "example": 2
+                }
+            }
+        },
+        "notifications.SubscribeRequest": {
+            "type": "object",
+            "required": [
+                "auth",
+                "endpoint",
+                "p256dh"
+            ],
+            "properties": {
+                "auth": {
+                    "type": "string",
+                    "example": "xyz123..."
+                },
+                "endpoint": {
+                    "type": "string",
+                    "example": "https://fcm.googleapis.com/fcm/send/..."
+                },
+                "p256dh": {
+                    "type": "string",
+                    "example": "BPxY..."
                 }
             }
         }

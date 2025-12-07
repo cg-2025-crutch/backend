@@ -9,19 +9,22 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/config"
+	analytics_pb "github.com/cg-2025-crutch/backend/api-gateway/internal/grpc/gen/analytics_service"
 	funds_pb "github.com/cg-2025-crutch/backend/api-gateway/internal/grpc/gen/funds_service"
 	notif_pb "github.com/cg-2025-crutch/backend/api-gateway/internal/grpc/gen/notification_service"
 	user_pb "github.com/cg-2025-crutch/backend/api-gateway/internal/grpc/gen/user_service"
 )
 
 type GRPCClients struct {
-	UserService  user_pb.UserServiceClient
-	FundsService funds_pb.FundsServiceClient
-	NotifService notif_pb.NotificationServiceClient
+	UserService      user_pb.UserServiceClient
+	FundsService     funds_pb.FundsServiceClient
+	NotifService     notif_pb.NotificationServiceClient
+	AnalyticsService analytics_pb.AnalyticsServiceClient
 
-	userConn  *grpc.ClientConn
-	fundsConn *grpc.ClientConn
-	notifConn *grpc.ClientConn
+	userConn      *grpc.ClientConn
+	fundsConn     *grpc.ClientConn
+	notifConn     *grpc.ClientConn
+	analyticsConn *grpc.ClientConn
 }
 
 func NewGRPCClients(cfg config.AppConfig) (*GRPCClients, error) {
@@ -74,6 +77,22 @@ func NewGRPCClients(cfg config.AppConfig) (*GRPCClients, error) {
 	clients.notifConn = notifConn
 	clients.NotifService = notif_pb.NewNotificationServiceClient(notifConn)
 
+	// Connect to Analytics Service
+	analyticsAddr := fmt.Sprintf("%s:%s", cfg.AnalyticsServiceClient.Host, cfg.AnalyticsServiceClient.Port)
+	analyticsConn, err := grpc.NewClient(
+		analyticsAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.WaitForReady(true),
+		),
+	)
+	if err != nil {
+		clients.Close()
+		return nil, fmt.Errorf("failed to connect to analytics service: %w", err)
+	}
+	clients.analyticsConn = analyticsConn
+	clients.AnalyticsService = analytics_pb.NewAnalyticsServiceClient(analyticsConn)
+
 	return clients, nil
 }
 
@@ -86,6 +105,9 @@ func (c *GRPCClients) Close() {
 	}
 	if c.notifConn != nil {
 		_ = c.notifConn.Close()
+	}
+	if c.analyticsConn != nil {
+		_ = c.analyticsConn.Close()
 	}
 }
 

@@ -23,6 +23,42 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/analytics/recommendations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Получает финансовые рекомендации для пользователя на основе его транзакций и категорий расходов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "analytics"
+                ],
+                "summary": "Получить рекомендации пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Рекомендации пользователя",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/funds/balance": {
             "get": {
                 "security": [
@@ -274,7 +310,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_funds.CreateTransactionRequest"
+                            "$ref": "#/definitions/funds.CreateTransactionRequest"
                         }
                     }
                 ],
@@ -444,7 +480,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_funds.UpdateTransactionRequest"
+                            "$ref": "#/definitions/funds.UpdateTransactionRequest"
                         }
                     }
                 ],
@@ -548,7 +584,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_handlers_notifications.SubscribeRequest"
+                            "$ref": "#/definitions/notifications.SubscribeRequest"
                         }
                     }
                 ],
@@ -883,7 +919,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_handlers_funds.CreateTransactionRequest": {
+        "funds.CreateTransactionRequest": {
             "type": "object",
             "required": [
                 "amount",
@@ -924,7 +960,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_handlers_funds.UpdateTransactionRequest": {
+        "funds.UpdateTransactionRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -950,28 +986,6 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "expense"
-                }
-            }
-        },
-        "internal_handlers_notifications.SubscribeRequest": {
-            "type": "object",
-            "required": [
-                "auth",
-                "endpoint",
-                "p256dh"
-            ],
-            "properties": {
-                "auth": {
-                    "type": "string",
-                    "example": "xyz123..."
-                },
-                "endpoint": {
-                    "type": "string",
-                    "example": "https://fcm.googleapis.com/fcm/send/..."
-                },
-                "p256dh": {
-                    "type": "string",
-                    "example": "BPxY..."
                 }
             }
         },
@@ -1063,6 +1077,28 @@ const docTemplate = `{
                 "work_sphere_id": {
                     "type": "integer",
                     "example": 2
+                }
+            }
+        },
+        "notifications.SubscribeRequest": {
+            "type": "object",
+            "required": [
+                "auth",
+                "endpoint",
+                "p256dh"
+            ],
+            "properties": {
+                "auth": {
+                    "type": "string",
+                    "example": "xyz123..."
+                },
+                "endpoint": {
+                    "type": "string",
+                    "example": "https://fcm.googleapis.com/fcm/send/..."
+                },
+                "p256dh": {
+                    "type": "string",
+                    "example": "BPxY..."
                 }
             }
         }

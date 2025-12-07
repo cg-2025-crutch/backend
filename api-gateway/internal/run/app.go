@@ -10,6 +10,7 @@ import (
 	_ "github.com/cg-2025-crutch/backend/api-gateway/docs"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/clients"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/config"
+	"github.com/cg-2025-crutch/backend/api-gateway/internal/handlers/analytics"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/handlers/funds"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/handlers/notifications"
 	"github.com/cg-2025-crutch/backend/api-gateway/internal/handlers/user"
@@ -75,6 +76,7 @@ func Run(mainCtx context.Context) error {
 	userHandler := user.NewUserHandler(grpcClients)
 	fundsHandler := funds.NewFundsHandler(grpcClients)
 	notificationsHandler := notifications.NewNotificationsHandler(grpcClients)
+	analyticsHandler := analytics.NewAnalyticsHandler(grpcClients)
 
 	// Register public routes (user registration and login)
 	userHandler.RegisterPublicRoutes(api)
@@ -90,6 +92,7 @@ func Run(mainCtx context.Context) error {
 	userHandler.RegisterSecuredRoutes(protected)
 	fundsHandler.RegisterRoutes(protected)
 	notificationsHandler.RegisterRoutes(protected)
+	analyticsHandler.RegisterRoutes(protected)
 
 	// Start server
 	addr := fmt.Sprintf("%s:%s", conf.Server.Host, conf.Server.Port)
